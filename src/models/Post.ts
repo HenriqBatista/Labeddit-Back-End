@@ -1,7 +1,9 @@
+import { CommentAndCreatorNameDB, CommentModel } from "./Comment";
 
 export interface PostDB {
     id: string;
     creator_id: string;
+    comments: number;
     content: string;
     likes: number;
     dislikes: number;
@@ -12,6 +14,7 @@ export interface PostDB {
 export interface PostDBAndCreatorName {
     id: string;
     creator_id: string;
+    comments: number;
     content: string;
     likes: number;
     dislikes: number;
@@ -23,6 +26,7 @@ export interface PostDBAndCreatorName {
 export interface PostModel{
     id: string;
     content: string;
+    comments: number;
     likes: number;
     dislikes: number;
     createdAt: string;
@@ -32,6 +36,34 @@ export interface PostModel{
         name:string
     }
 }
+
+export interface PostAndCommentsDB{
+    id:string;
+    content:string;
+    comments: number;
+    likes: number;
+    dislikes: number;
+    created_at:string;
+    updated_at:string;
+    creator_name:string;
+    comments_post: CommentAndCreatorNameDB[]
+}
+
+export interface PostAndCommentsModel{
+    id:string;
+    content:string;
+    comments: number;
+    likes: number;
+    dislikes: number;
+    createdAt:string;
+    updatedAt:string;
+    creator:{
+        id:string;
+        username:string;
+    },
+    commentsPost: CommentModel[]
+}
+
 
 export interface LikeDislikeDB {
     user_id: string;
@@ -49,6 +81,7 @@ export class Post {
     constructor(
         private id: string,
         private content: string,
+        private comments: number,
         private likes: number,
         private dislikes: number,
         private createdAt: string,
@@ -74,6 +107,9 @@ export class Post {
 
     public getDislikes(): number { return this.dislikes; }
     public setDislikes(value: number) { this.dislikes = value; }
+
+    public getComments(): number { return this.comments; }
+    public setComments(value: number) { this.comments = value; }
 
     public getCreatedAt(): string { return this.createdAt; }
     public setCreatedAt(value: string) { this.createdAt = value; }
@@ -102,6 +138,7 @@ export class Post {
         id: this.id,
         creator_id: this.creatorId,
         content: this.content,
+        comments: this.comments,
         likes: this.likes,
         dislikes: this.dislikes,
         created_at: this.createdAt,
@@ -113,6 +150,7 @@ export class Post {
         return{
         id: this.id,
         content: this.content,
+        comments: this.comments,
         likes: this.likes,
         dislikes: this.dislikes,
         createdAt: this.createdAt,
@@ -121,6 +159,23 @@ export class Post {
             id: this.creatorId,
             name: this.creatorName
         }
+        }
+    }
+
+    public toPostBusinessModelAndModel(commentsPost:CommentModel[]){
+        return{
+            id: this.id,
+            content: this.comments,
+            comments: this.comments,
+            likes: this.likes,
+            dislikes: this.dislikes,
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt,
+            creator:{
+                id: this.creatorId,
+                name: this.creatorName
+            },
+            commentsPost: commentsPost
         }
     }
 }
