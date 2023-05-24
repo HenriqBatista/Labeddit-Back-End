@@ -1,10 +1,12 @@
-import { LikeDislikeDB, POST_LIKE, Post, PostDB, PostDBAndCreatorName } from "../models/Post";
+import { CommentAndCreatorNameDB } from "../models/Comment";
+import { LikeDislikeDB, POST_LIKE, Post, PostDB, PostDBAndCreatorName, PostAndCommentsDB } from "../models/Post";
 import { BaseDatabase } from "./BaseDatabase";
 import { UserDatabase } from "./UserDatabase";
 
 export class PostDatabase extends BaseDatabase{
     public static POST_TABLE = "posts"
     public static LIKES_DISLIKES_TABLE = "likes_dislikes"
+    public static COMMENTS_TABLE = "comments_posts"
     
 
     public findPostsAndCreatorName = async ():Promise<PostDBAndCreatorName[]>=>{
@@ -15,6 +17,7 @@ export class PostDatabase extends BaseDatabase{
             `${PostDatabase.POST_TABLE}.id`,
             `${PostDatabase.POST_TABLE}.creator_id`,
             `${PostDatabase.POST_TABLE}.content`,
+            `${PostDatabase.POST_TABLE}.comments`,
             `${PostDatabase.POST_TABLE}.likes`,
             `${PostDatabase.POST_TABLE}.dislikes`,
             `${PostDatabase.POST_TABLE}.created_at`,
@@ -60,6 +63,7 @@ export class PostDatabase extends BaseDatabase{
             `${PostDatabase.POST_TABLE}.id`,
             `${PostDatabase.POST_TABLE}.creator_id`,
             `${PostDatabase.POST_TABLE}.content`,
+            `${PostDatabase.POST_TABLE}.comments`,
             `${PostDatabase.POST_TABLE}.likes`,
             `${PostDatabase.POST_TABLE}.dislikes`,
             `${PostDatabase.POST_TABLE}.created_at`,
@@ -70,6 +74,43 @@ export class PostDatabase extends BaseDatabase{
         .where({[`${PostDatabase.POST_TABLE}.id`]: id})
 
         return result as PostDBAndCreatorName | undefined;
+    }
+
+    public findPostAndCommentsById = async (id:string): Promise<PostAndCommentsDB|undefined>=>{
+        const [postAndComments]: PostAndCommentsDB[] = await BaseDatabase
+        .connection(PostDatabase.POST_TABLE)
+        .select(
+            `${PostDatabase.POST_TABLE}.id`,
+            `${PostDatabase.POST_TABLE}.creator_id`,
+            `${PostDatabase.POST_TABLE}.content`,
+            `${PostDatabase.POST_TABLE}.comments`,
+            `${PostDatabase.POST_TABLE}.likes`,
+            `${PostDatabase.POST_TABLE}.dislikes`,
+            `${PostDatabase.POST_TABLE}.created_at`,
+            `${PostDatabase.POST_TABLE}.updated_at`,
+            `${UserDatabase.TABLE_USERS}.name as creator_name`,
+        )
+        .join(`${UserDatabase.TABLE_USERS}`,`${PostDatabase.POST_TABLE}.creator_id`,"=",`${UserDatabase.TABLE_USERS}.id`)
+        .where({[`${PostDatabase.POST_TABLE}.id`]:id})
+
+        const commentsDB:CommentAndCreatorNameDB[] = await BaseDatabase
+        .connection(PostDatabase.COMMENTS_TABLE)
+        .select(
+            `${PostDatabase.COMMENTS_TABLE}.id`,
+            `${PostDatabase.COMMENTS_TABLE}.content`,
+            `${PostDatabase.COMMENTS_TABLE}.likes`,
+            `${PostDatabase.COMMENTS_TABLE}.dislikes`,
+            `${PostDatabase.COMMENTS_TABLE}.created_at`,
+            `${PostDatabase.COMMENTS_TABLE}.updated_at`,
+            `${PostDatabase.COMMENTS_TABLE}.creator_id`,
+            `${UserDatabase.TABLE_USERS}.name AS creator_name`
+        )
+        .join(`${UserDatabase.TABLE_USERS}`,`${PostDatabase.COMMENTS_TABLE}.creator_id`,"=",`${UserDatabase.TABLE_USERS}.id`)
+        .where({[`${PostDatabase.COMMENTS_TABLE}.post_id`]:id})
+
+        const result: PostAndCommentsDB = {...postAndComments, comments_post:commentsDB}
+
+        return result
     }
     
     public findLikeDislike = async (

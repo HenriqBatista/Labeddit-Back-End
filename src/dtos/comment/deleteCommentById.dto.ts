@@ -12,4 +12,4 @@ export const DeleteCommentByIdSchemaOutput = z.object({
     message: z.string().min(1)
 })
 
-export type DeleteCommentByIdSchemaOutputDTO = z.infer<typeof DeleteCommentByIdSchemaOutput>
+export type DeleteCommentByIdOutputDTO = z.infer<typeof DeleteCommentByIdSchemaOutput>
