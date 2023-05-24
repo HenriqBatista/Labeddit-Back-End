@@ -8,10 +8,13 @@ import { GetPostInputDTO, GetPostOutputDTO } from "../dtos/post/getPosts.dto";
 import { LikeDislikePostInputDTO, LikeDislikePostOutputDTO } from "../dtos/post/likeDislikePost.dto";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
-import { LikeDislikeDB, POST_LIKE, Post } from "../models/Post";
+import { LikeDislikeDB, POST_LIKE, Post, PostAndCommentsDB, PostAndCommentsModel } from "../models/Post";
 import { USER_ROLES } from "../models/User";
 import { IdGenerator } from "../services/IdGenerator";
-import { TokenManager } from "../services/TokenManager";
+import { TokenManager, TokenPayload } from "../services/TokenManager";
+import { UnauthorizedError } from "../errors/UnauthorizedError";
+import { GetPostAndCommentByIdInputDTO, GetPostAndCommentByIdOutputDTO } from "../dtos/post/getPostAndCommentById.dto";
+import { Comment, CommentModel } from "../models/Comment";
 
 
 
@@ -39,6 +42,7 @@ export class PostBusiness{
         content,
         0,
         0,
+        0,
         new Date().toISOString(),
         new Date().toISOString(),
         payload.id,
@@ -58,7 +62,7 @@ export class PostBusiness{
     const {token} = input 
     const payload = this.tokenManager.getPayload(token)
     if(!payload){
-        throw new BadRequestError("Token inválido")
+        throw new UnauthorizedError("Token inválido")
     }
 
     const postsDBAndCreatorName = await this.postDatabase.findPostsAndCreatorName()
@@ -68,6 +72,7 @@ export class PostBusiness{
         const post = new Post(
         postAndCreatorName.id,
         postAndCreatorName.content,
+        postAndCreatorName.comments,
         postAndCreatorName.likes,
         postAndCreatorName.dislikes,
         postAndCreatorName.created_at,
@@ -80,6 +85,51 @@ export class PostBusiness{
     })
     const output: GetPostOutputDTO = posts
     return output
+   }
+
+   public getPostAndCommentsById = async (input: GetPostAndCommentByIdInputDTO):Promise<GetPostAndCommentByIdOutputDTO> => {
+    const { postId, token} = input
+    const payload: TokenPayload | null = this.tokenManager.getPayload(token)
+    if(!payload){
+        throw new UnauthorizedError("Token inválido.")
+    }
+
+    const postAndCommentsDB: PostAndCommentsDB | undefined = await this.postDatabase.findPostAndCommentsById(postId)
+    if(!postAndCommentsDB){
+        throw new NotFoundError("Post não encontrado.")
+    }
+
+    const commentsPost: CommentModel[] = postAndCommentsDB.comments_post.map((commentDB)=>{
+        const comment = new Comment(
+            commentDB.id, 
+            commentDB.post_id, 
+            commentDB.content,
+            commentDB.likes,
+            commentDB.dislikes,
+            commentDB.created_at,
+            commentDB.updated_at,
+            commentDB.creator_id,
+            commentDB.creator_name
+        )
+        return comment.toCommentBusinessModel()
+    })
+
+    const post = new Post(
+        postAndCommentsDB.id, 
+        postAndCommentsDB.content,
+        postAndCommentsDB.comments,
+        postAndCommentsDB.likes,
+        postAndCommentsDB.dislikes,
+        postAndCommentsDB.created_at,
+        postAndCommentsDB.updated_at,
+        postAndCommentsDB.creator_id,
+        postAndCommentsDB.creator_name,
+    )
+
+    const postAndCommentsModel: PostAndCommentsModel = post.toPostBusinessModelAndComments(commentsPost)
+    const output: GetPostAndCommentByIdOutputDTO = postAndCommentsModel
+    return output
+
    }
 
    public editPost = async (
@@ -104,6 +154,7 @@ export class PostBusiness{
     const post = new Post(
         postDB.id,
         postDB.content,
+        postDB.comments,
         postDB.likes,
         postDB.dislikes,
         postDB.created_at,
@@ -166,6 +217,7 @@ export class PostBusiness{
  const post = new Post(
     postDBAndCreatorName.id,
     postDBAndCreatorName.content,
+    postDBAndCreatorName.comments,
     postDBAndCreatorName.likes,
     postDBAndCreatorName.dislikes,
     postDBAndCreatorName.created_at,

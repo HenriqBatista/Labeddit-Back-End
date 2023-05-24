@@ -45,6 +45,7 @@ export interface PostAndCommentsDB{
     dislikes: number;
     created_at:string;
     updated_at:string;
+    creator_id:string;
     creator_name:string;
     comments_post: CommentAndCreatorNameDB[]
 }
@@ -59,7 +60,7 @@ export interface PostAndCommentsModel{
     updatedAt:string;
     creator:{
         id:string;
-        username:string;
+        name:string;
     },
     commentsPost: CommentModel[]
 }
@@ -133,6 +134,14 @@ export class Post {
         this.dislikes --
     }
 
+    public removeComments = () =>{
+        this.comments --
+    }
+
+    public addComment = () => {
+        this.comments ++
+    }
+
     public toPostDBModel():PostDB{
         return{
         id: this.id,
@@ -162,10 +171,10 @@ export class Post {
         }
     }
 
-    public toPostBusinessModelAndModel(commentsPost:CommentModel[]){
+    public toPostBusinessModelAndComments(commentsPost:CommentModel[]):PostAndCommentsModel{
         return{
             id: this.id,
-            content: this.comments,
+            content: this.content,
             comments: this.comments,
             likes: this.likes,
             dislikes: this.dislikes,

@@ -30,7 +30,7 @@ export interface CommentModel {
     updatedAt: string,
     creator: {
         id: string,
-        username: string
+        name: string
     }
 }
 
@@ -129,7 +129,7 @@ export class Comment {
         updatedAt: this.updatedAt,
         creator:{
             id: this.creatorId,
-            username: this.creatorName
+            name: this.creatorName
         }
         }
     }

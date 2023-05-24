@@ -7,7 +7,7 @@ export const GetPostAndCommentByIdSchema = z.object({
 
 export type GetPostAndCommentByIdInputDTO = z.infer<typeof GetPostAndCommentByIdSchema>
 
-export const GetPostAndCommentByIdOutput = z.object({
+export const GetPostAndCommentByIdSchemaOutput = z.object({
     id: z.string(),
     content: z.string(),
     comments: z.number(),
@@ -17,7 +17,7 @@ export const GetPostAndCommentByIdOutput = z.object({
     updatedAt: z.string(),
     creator: z.object({
         id: z.string(),
-        username: z.string()
+        name: z.string()
     }),
     commentsPost: z.array(
         z.object({
@@ -29,10 +29,10 @@ export const GetPostAndCommentByIdOutput = z.object({
             updatedAt: z.string(),
             creator: z.object({
                 id: z.string(), 
-                username: z.string()
+                name: z.string()
             })
         }).optional()
     )
 })
 
-export type GetPostAndCommentByIdOutputDTO = z.infer<typeof GetPostAndCommentByIdOutput>
+export type GetPostAndCommentByIdOutputDTO = z.infer<typeof GetPostAndCommentByIdSchemaOutput>

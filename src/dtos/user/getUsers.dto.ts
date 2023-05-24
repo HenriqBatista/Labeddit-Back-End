@@ -1,5 +1,5 @@
 import z from "zod"
-import { UserModel } from "../models/User"
+import { UserModel } from "../../models/User"
 
 export interface GetUsersInputDTO {
   q: string
