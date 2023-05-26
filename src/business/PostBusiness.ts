@@ -34,7 +34,7 @@ export class PostBusiness{
 
     const payload = this.tokenManager.getPayload(token)
     if(!payload){
-        throw new BadRequestError("Token inválido")
+        throw new UnauthorizedError()
     }
     const id = this.idGenerator.generate()
     const post = new Post(
@@ -51,7 +51,9 @@ export class PostBusiness{
     const postDB = post.toPostDBModel()
     await this.postDatabase.createPost(postDB)
 
-    const output: CreatePostOutputDTO = undefined
+    const output: CreatePostOutputDTO = {
+        message: "Post criado com sucesso!"
+    }
     return output
 
    }

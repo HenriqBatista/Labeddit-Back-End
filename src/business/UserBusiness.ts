@@ -3,7 +3,9 @@ import { GetUsersInputDTO, GetUsersOutputDTO } from "../dtos/user/getUsers.dto";
 import { LoginInputDTO, LoginOutputDTO } from "../dtos/user/login.dto";
 import { SignupInputDTO, SignupOutputDTO } from "../dtos/user/signup.dto";
 import { BadRequestError } from "../errors/BadRequestError";
+import { ForbiddenError } from "../errors/ForbiddenError";
 import { NotFoundError } from "../errors/NotFoundError";
+import { UnauthorizedError } from "../errors/UnauthorizedError";
 import { USER_ROLES, User } from "../models/User";
 import { HashManager } from "../services/HashManager";
 import { IdGenerator } from "../services/IdGenerator";
@@ -24,10 +26,10 @@ export class UserBusiness {
     const payload = this.tokenManager.getPayload(token);
 
     if(payload === null){
-      throw new NotFoundError("Token inválido.")
+      throw new UnauthorizedError("Token inválido.")
     }
     if(payload.role !== USER_ROLES.ADMIN){
-      throw new BadRequestError("Apenas Pessoas Admins podem acessar a lista de todos os usuários.")
+      throw new ForbiddenError("Acesso negado. Você não tem permissão para acessar esse conteúdo.")
     }
 
     const usersDB = await this.userDatabase.findUsers(q);
@@ -94,7 +96,7 @@ export class UserBusiness {
     const userDB = await this.userDatabase.findUserByEmail(email)
 
     if (!userDB) {
-      throw new NotFoundError("'email' não encontrado")
+      throw new BadRequestError("'password' ou 'email' incorretos.")
     }
 
     const correctPassword = await this.hashManager.compare(password, userDB.password)
@@ -119,7 +121,7 @@ export class UserBusiness {
     const token = this.tokenManager.createToken(tokenPayload)
 
     const output: LoginOutputDTO = {
-      message: "Login realizado com sucesso",
+      message: "Login realizado com sucesso.",
       token: token
     }
 

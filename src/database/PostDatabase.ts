@@ -40,19 +40,17 @@ export class PostDatabase extends BaseDatabase{
         )=>{
         await BaseDatabase.connection(PostDatabase.POST_TABLE).insert(postDB)
 
-        return "Post criado com sucesso!"
     }
 
     public editPost = async (updatedPostDB:PostDB)=>{
         await BaseDatabase.connection(PostDatabase.POST_TABLE).update(updatedPostDB).where({id: updatedPostDB.id})
 
-        return "Post editado com sucesso!"
     }
 
     public deletePost = async (id:string)=>{
         await BaseDatabase.connection(PostDatabase.POST_TABLE).del().where({id: id})
 
-        return "Post excluido com sucesso!"
+       
     }
 
     public findPostAndCreatorDBById = async (id:string):Promise<PostDBAndCreatorName| undefined>=>{
