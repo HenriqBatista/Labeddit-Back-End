@@ -15,6 +15,7 @@ import { TokenManager, TokenPayload } from "../services/TokenManager";
 import { UnauthorizedError } from "../errors/UnauthorizedError";
 import { GetPostAndCommentByIdInputDTO, GetPostAndCommentByIdOutputDTO } from "../dtos/post/getPostAndCommentById.dto";
 import { Comment, CommentModel } from "../models/Comment";
+import { ForbiddenError } from "../errors/ForbiddenError";
 
 
 
@@ -64,7 +65,7 @@ export class PostBusiness{
     const {token} = input 
     const payload = this.tokenManager.getPayload(token)
     if(!payload){
-        throw new UnauthorizedError("Token inválido")
+        throw new UnauthorizedError()
     }
 
     const postsDBAndCreatorName = await this.postDatabase.findPostsAndCreatorName()
@@ -93,7 +94,7 @@ export class PostBusiness{
     const { postId, token} = input
     const payload: TokenPayload | null = this.tokenManager.getPayload(token)
     if(!payload){
-        throw new UnauthorizedError("Token inválido.")
+        throw new UnauthorizedError()
     }
 
     const postAndCommentsDB: PostAndCommentsDB | undefined = await this.postDatabase.findPostAndCommentsById(postId)
@@ -141,7 +142,7 @@ export class PostBusiness{
 
     const payload = this.tokenManager.getPayload(token)
     if(!payload){
-        throw new BadRequestError("Token inválido")
+        throw new UnauthorizedError()
     }
 
     const postDB = await this.postDatabase.findPostById(id)
@@ -150,7 +151,7 @@ export class PostBusiness{
         throw new NotFoundError("Esse Post não existe.")
     }
     if(payload.id !== postDB.creator_id){
-        throw new BadRequestError("Somente o criador do Post pode editá-lo")
+        throw new ForbiddenError("Somente o criador do Post pode editá-lo")
     }
 
     const post = new Post(
@@ -170,7 +171,9 @@ export class PostBusiness{
     const updatedPostDB = post.toPostDBModel()
     await this.postDatabase.editPost(updatedPostDB)
 
-    const output: EditPostOutputDTO = undefined
+    const output: EditPostOutputDTO = {
+        message:"Post editado com sucesso."
+    }
     return output
 
    }
@@ -182,7 +185,7 @@ export class PostBusiness{
 
     const payload = this.tokenManager.getPayload(token)
     if(!payload){
-        throw new BadRequestError("Token inválido")
+        throw new UnauthorizedError()
     }
 
     const postDB = await this.postDatabase.findPostById(idToDelete)
@@ -192,12 +195,14 @@ export class PostBusiness{
     }
     if(payload.role !== USER_ROLES.ADMIN){
         if(payload.id !== postDB.creator_id){
-            throw new BadRequestError("Somente o criador do Post pode editá-lo")
+            throw new ForbiddenError("Somente o criador do Post pode deleta-lo")
         }}
 
     await this.postDatabase.deletePost(idToDelete)
 
-    const output: DeletePostOutputDTO = undefined
+    const output: DeletePostOutputDTO = {
+        message: "Post deletado com sucesso."
+    }
     return output
 
    }
@@ -209,7 +214,7 @@ export class PostBusiness{
 
     const payload = this.tokenManager.getPayload(token)
     if(!payload){
-        throw new BadRequestError("Token inválido")
+        throw new UnauthorizedError()
     }
 
     const postDBAndCreatorName = await this.postDatabase.findPostAndCreatorDBById(postId)

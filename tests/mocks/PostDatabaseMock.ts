@@ -43,6 +43,16 @@ const postsMock: PostDB[] = [
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
+  {
+    id: "p003",
+    creator_id: "id-mock-henrique",
+    comments: 0,
+    content: "post 3",
+    likes: 0,
+    dislikes: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
 ];
 
 export const likeDislikesPostMock: LikeDislikeDB[] = [
@@ -90,7 +100,7 @@ export class PostDatabaseMock extends BaseDatabase {
           creator_id: "id-mock-henrique",
           comments: 0,
           content: "post 1",
-          likes: 1,
+          likes: 0,
           dislikes: 0,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -102,7 +112,19 @@ export class PostDatabaseMock extends BaseDatabase {
           creator_id: "id-mock-larissa",
           comments: 0,
           content: "post 2",
-          likes: 1,
+          likes: 0,
+          dislikes: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          creator_name: "larissa",
+        };
+      case "p003":
+        return {
+          id: "p002",
+          creator_id: "id-mock-henrique",
+          comments: 0,
+          content: "post 3",
+          likes: 0,
           dislikes: 0,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -122,7 +144,7 @@ export class PostDatabaseMock extends BaseDatabase {
                 creator_id: "id-mock-henrique",
                 comments: 0,
                 content: "post 1",
-                likes: 1,
+                likes: 0,
                 dislikes: 0,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
