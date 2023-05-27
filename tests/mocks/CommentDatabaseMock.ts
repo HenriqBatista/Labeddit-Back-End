@@ -25,7 +25,7 @@ export const commentsMock: CommentDB[] = [
     post_id: "p001",
     content: "comentário 1",
     likes: 0,
-    dislikes: 0,
+    dislikes: 1,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     creator_id: "id-mock-larissa",

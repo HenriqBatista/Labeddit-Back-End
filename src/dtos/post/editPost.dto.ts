@@ -6,7 +6,11 @@ export interface EditPostInputDTO {
     id: string
 }
 
-export type EditPostOutputDTO = undefined
+export const EditpostOutputschema = z.object({
+    message: z.string().min(1)
+})
+
+export type EditPostOutputDTO = z.infer<typeof EditpostOutputschema >
 
 export const EdiitPostSchema = z.object({
     content: z.string().min(1),
