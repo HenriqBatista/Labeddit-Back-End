@@ -94,7 +94,7 @@ export class PostController {
 
           const output = await this.postBusiness.editPost(input)
 
-          res.status(200).send({message:"Post editado com sucesso.",output})
+          res.status(200).send({output})
 
       } catch (error) {
         console.log(error)
