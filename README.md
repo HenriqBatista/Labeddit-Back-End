@@ -104,7 +104,7 @@ Jest
 ````
 <br>
 <br>
-<br>
+
 
 ## 🤖 Testes unitários
  - Foi realizado testes unitários utilizando o Jest em 100% da business da aplicação.
